@@ -1,0 +1,162 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+  overflow-x: hidden;
+}
+
+/* Sidebar à esquerda */
+.sidebar {
+  width: 100%;
+  max-width: 320px;
+  height: 100vh;
+  background: #e5e7d7;
+  color: #1d1c1c;
+  position: fixed;
+  top: 0;
+  left: 0;
+  transform: translateX(0);
+  transition: all 0.4s ease;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Cabeçalho da sidebar */
+.sidebar-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  flex-direction: column;
+}
+
+.sidebar-header h2 {
+  font-size: 18px;
+  color: #1d1c1c;
+  font-weight: bold;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.sidebar-header h2 a {
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+  line-height: 1.4;
+}
+
+.sidebar-header h2 a:hover {
+  color: #373902;
+}
+
+/* Título "Fases do Procedimento..." */
+.title_fase {
+  display: block;
+  font-size: 16px;
+  text-align: left;
+  margin-bottom: 5px;
+  margin-top: 20px;
+  color: #2c3e50;
+}
+
+/* Primeiro item da lista */
+.sidebar ul li:first-of-type {
+  margin-top: 0;
+}
+
+/* Lista da sidebar */
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 25px 0 0 0;
+}
+
+.sidebar ul li {
+  margin: 20px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 15px 12px;
+  border-radius: 10px;
+  transition: background-color 0.3s;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.sidebar ul li:hover {
+  background-color: #f0f2f5;
+}
+
+/* Ícones das fases */
+.icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 6px;
+  padding: 4px;
+}
+
+/* Título dentro de cada item */
+.item-content .title {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+/* Descrição dos itens */
+.description {
+  font-size: 13px;
+  color: #000000;
+  margin: 0;
+  line-height: 1.5;
+  text-align: left;
+  margin-left: 15px;
+}
+
+/* Mapa em tela cheia ao fundo */
+#mapa_geportal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  z-index: 0;
+}
+
+/* === LABELS KOKAMA NO MAPA === */
+.leaflet-tooltip.label-kokama {
+  background: transparent !important;   /* sem fundo */
+  border: none !important;              /* sem borda */
+  box-shadow: none !important;          /* sem sombra */
+  padding: 0 !important;                /* sem padding */
+  color: #fff4b7 !important;            /* amarelo */
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.9); /* legibilidade */
+}
+
+/* remove a flecha do tooltip */
+.leaflet-tooltip.label-kokama::before {
+  border: none !important;
+}
+
+.municipio-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: white !important;
+  background: none !important;
+  border: none !important;
+  padding: 0;
+  box-shadow: none !important;
+  text-shadow: 1px 1px 3px black; /* mejora la lectura sobre el fondo */
+}

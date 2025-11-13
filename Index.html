@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Imagens/Logo.png">
+    <title>Atlas Territorial Kokama</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="Atlas_kokama.css">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+</head>
+
+<body>
+
+    <!-- Sidebar Esquerda -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a>GeoPortal das Comunidades Kokama <br>Terras Indígenas do Alto Solimões</a></h2>
+        </div>
+    
+
+    
+ 
+    
+  
+        </ul>
+    </div>
+    
+
+  <!-- Contenedor del mapa -->
+  <div id="mapa_geportal"></div>
+
+   <!-- Carga de datos GeoJSON (antes de iniciar el mapa) -->
+<script src="./Dados/Paises.js"></script>
+<script src="./Dados/Comunidades_kokama2025.js"></script>
+<script src="./Dados/Terrasindigenasamazonas.js"></script>
+<script src="./Dados/TI_emdemarcacao_ica.js"></script>
+<script src="./Dados/Unidadesconservacao.js"></script>
+<script src="./Dados/municipiosamazonas.js"></script>
+<script src="./Dados/Lagos_kokama.js"></script>
+
+
+  <script>
+    // === 1) Mapa base ===
+    var map = L.map('mapa_geportal').setView([-3.171473721252239, -68.70338705060058], 8);
+
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles © Esri'
+    }).addTo(map);
+
+
+   function agregarEtiqueta(pais, coordenadas) {
+    // Sanear el nombre del país para usarlo como clase CSS válida
+    var claseSegura = pais.replace(/[^\w]/g, '_'); // reemplaza cualquier carácter no alfanumérico por "_"
+
+    // Crear el ícono
+    var icono = L.divIcon({
+        className: `${claseSegura}-label`,
+        html: `<strong>${pais}</strong>`,
+        iconSize: [0, 0]
+    });
+
+    // Agregar al mapa
+    L.marker(coordenadas, { icon: icono }).addTo(map);
+
+    // Agregar estilos CSS
+    var css = `
+    .${claseSegura}-label {
+        font-size: 20px;
+        font-family: "museo-sans", "Helvetica Neue", "Segoe UI", sans-serif;
+        font-weight: 500;
+        color: #f0e68c;
+        text-align: center;
+        white-space: nowrap;
+        text-shadow: 0.5px 0.5px 1.2px #333;
+        pointer-events: none;
+    }
+    `;
+
+    var style = document.createElement('style');
+    style.innerHTML = css;
+    document.head.appendChild(style);
+}
+
+// Usar la función para todos los países
+agregarEtiqueta('Brasil', [-3.3539890169080753, -66.68741793117148]);
+agregarEtiqueta('Colômbia', [-1.7900600922272933, -70.51478372781109]);
+agregarEtiqueta('Venezuela', [7.622118788107889, -66.31808037791757]);
+agregarEtiqueta('Equador', [-0.884497166151901, -78.99730260958557]);
+agregarEtiqueta('Guiana', [6.413214767901349, -60.11703500188913]);
+agregarEtiqueta('Suriname', [4.781392557546367, -57.50482878625499]);
+agregarEtiqueta('Peru', [-2.902332200497913, -70.87969909226685]);
+agregarEtiqueta('Bolivia', [-17.03664872553583, -64.85304285238603]);
+agregarEtiqueta('Paraguai', [-22.830756531099013, -58.6079633162309]);
+agregarEtiqueta('Uruguai', [-33.23346748549864, -55.890439161739195]);
+agregarEtiqueta('Argentina', [-32.86112212318275, -63.75558118579692]);
+agregarEtiqueta('Chile', [-27.209648576279136, -70.02679077308548]);
+agregarEtiqueta('Guiana (Fr)', [5.15316268573154, -54.248052016934416]);
+
+
+// 1️⃣ Ícono
+var Kokama_ICON = L.icon({
+  iconUrl: 'Imagens/comunidadeskokama.png',
+  iconSize: [15, 15],
+});
+
+// 2️⃣ Datos
+var KokamaData = Comunidades_kokama2025;
+
+// 3️⃣ Capa GeoJSON
+var KokamaLayer = L.geoJSON(KokamaData, {
+  pointToLayer: function (feature, latlng) {
+    return L.marker(latlng, { icon: Kokama_ICON });
+  },
+
+onEachFeature: function (feature, layer) {
+
+  // Crear popup base
+  var popupContent =
+    '<strong>Comunidade:</strong> ' + feature.properties.Aldeia_Nom + '<br>' +
+    '<strong>Etnia:</strong> ' + feature.properties.ETNIA + '<br>' +
+    '<strong>Estado Jurídico:</strong> ' + feature.properties.TI + '<br>';
+
+  // ⭐ Agregar imagen SOLO si la aldea es São José
+  if (feature.properties.Aldeia_Nom === "São José") {
+    popupContent += `
+      <br>
+      <a href="Imagens/SaoJose.png" target="_blank">
+        <img src="Imagens/SaoJose.png"
+             style="width:250px; max-width:100%; border-radius:6px; cursor:pointer;">
+      </a>
+    `;
+  }
+
+  if (feature.properties.Aldeia_Nom === "São Gabriel") {
+    popupContent += `
+      <br>
+      <a href="Imagens/SaoGabriel.png" target="_blank">
+        <img src="Imagens/SaoGabriel.png"
+             style="width:250px; max-width:100%; border-radius:6px; cursor:pointer;">
+      </a>
+    `;
+  }
+
+    if (feature.properties.Aldeia_Nom === "São Salvador") {
+    popupContent += `
+      <br>
+      <a href="Imagens/saosalvador.png" target="_blank">
+        <img src="Imagens/saosalvador.png"
+             style="width:250px; max-width:100%; border-radius:6px; cursor:pointer;">
+      </a>
+    `;
+  }
+
+      if (feature.properties.Aldeia_Nom === "Boa União") {
+    popupContent += `
+      <br>
+      <a href="Imagens/boauniao.png" target="_blank">
+        <img src="Imagens/boauniao.png"
+             style="width:250px; max-width:100%; border-radius:6px; cursor:pointer;">
+      </a>
+    `;
+  }
+
+
+      if (feature.properties.Aldeia_Nom === "Kuarachi Kuema") {
+    popupContent += `
+      <br>
+      <a href="Imagens/kuarachikuema.png" target="_blank">
+        <img src="Imagens/kuarachikuema.png"
+             style="width:250px; max-width:100%; border-radius:6px; cursor:pointer;">
+      </a>
+    `;
+  }
+  layer.bindPopup(popupContent);
+
+  // Tooltip permanente
+  layer.bindTooltip(feature.properties.Aldeia_Nom, {
+    permanent: true,
+    direction: "top",
+    offset: [0, -10],
+    className: "label-kokama",
+    opacity: 0
+  });}});
+
+// 4️⃣ Mostrar/Ocultar nombres según el nivel de zoom
+var zoomToShowLabels = 10;  // cambia este valor si quieres otro nivel
+
+map.on('zoomend', function () {
+  var currentZoom = map.getZoom();
+
+  KokamaLayer.eachLayer(function (layer) {
+    if (layer.getTooltip()) {
+      layer.getTooltip().setOpacity(currentZoom >= zoomToShowLabels ? 1 : 0);
+    }
+  });
+});
+
+
+      var TI_emdemarcacao_ica = L.geoJSON(TI_emdemarcacao_icaLayer, {
+        style: function(feature) {
+            return { color: 'Grey', weight: 1, fillOpacity: 0.3 };
+        },
+        onEachFeature: function(feature, layer) {
+            if (feature.properties) {
+                var popupContent = '<strong>Nome da Terra Indígena:</strong> ' + feature.properties.Nome;
+                layer.bindPopup(popupContent);}}});
+
+
+
+      var Terrasindigenasamazonas = L.geoJSON(Terrasindigenasamazonas, {
+        style: function(feature) {
+            return { color: '#FFD37F', weight: 0.5, fillOpacity: 0.1 };
+        },
+        onEachFeature: function(feature, layer) {
+            if (feature.properties && feature.properties.terrai_nom) {
+                var popupContent = 
+                '<strong>Nome da Terra Indígena:</strong> ' + feature.properties.terrai_nom + '<br>' +
+                '<strong>Município: </strong> ' + feature.properties.municipio_ + '<br>' +
+                '<strong>Estado Jurídico: </strong> ' + feature.properties.fase_ti;
+                layer.bindPopup(popupContent);}}});
+
+
+var Lagos_kokama = L.geoJSON(Lagos_kokama, {
+    style: function(feature) {
+        return { color: 'blue', weight: 1, fillOpacity: 1 };
+    },
+    onEachFeature: function(feature, layer) {
+        if (feature.properties && feature.properties.Nome) {
+
+            var popupContent =
+                '<strong>Lago:</strong> ' + feature.properties.Nome;
+
+            layer.bindPopup(popupContent)}}});
+
+
+                var unidadesconservacaoLayer = L.geoJSON(unidadesconservacao, {
+    style: function(feature) {
+        return { color: '#66FF79', weight: 0.5, fillOpacity: 0.05 };
+    },
+    onEachFeature: function(feature, layer) {
+        if (feature.properties && feature.properties.NOME_UC1) {
+
+            var popupContent =
+                '<strong>Unidade de Conservação:</strong> ' + feature.properties.NOME_UC1 + '<br>' +
+                '<strong>Categoria: </strong> ' + feature.properties.CATEGORI3;
+
+            layer.bindPopup(popupContent)}}});
+
+
+var municipiosamazonasLayer = L.geoJSON(municipiosamazonas, {
+    style: function(feature) {
+        return { color: '#dbdbdb', weight: 1, fillOpacity: 0 };
+    },
+    interactive: false,   // 👈 deja pasar clics a capas inferiores
+
+    onEachFeature: function(feature, layer) {
+
+        // Mostrar nombre del municipio en tooltip permanente
+        if (feature.properties && feature.properties.NM_MUN) {
+
+            layer.bindTooltip(feature.properties.NM_MUN, {
+                permanent: true,
+                direction: "center",
+                className: "municipio-label"
+            });}}});
+
+
+
+
+// Capa de países: solo fondo, sin interacción
+var paisesLayer = L.geoJSON(paises, {
+  style: function(feature) {
+    return { color: '#eeeeee', weight: 3, fillOpacity: 0 };
+  },
+  interactive: false   // 👈 esto deja pasar los clics a las capas de abajo
+}).addTo(map);
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////    LEGENDA     /////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////    LEGENDA FASES DE DEMARCAÇÃO   ///////////////////////////////////////////////////////////
+
+// Etapa 1: Mapear as camadas em formato HTML e definir estilos
+// Crear el grupo de capas superpuestas
+var overlayMaps_terrasindigenas = { 
+    "<strong><span style='font-size: 15px;'>Comunidades Kokama</span></strong>": KokamaLayer,
+    "<strong><span style='font-size: 15px;'>Terras Indígenas Estado Amazonas</span></strong>": Terrasindigenasamazonas,
+    "<strong><span style='font-size: 15px;'>Terras Indígenas Kokama em Demarcação</span></strong>": TI_emdemarcacao_ica,
+    "<strong><span style='font-size: 15px;'>Unidades de Conservação</span></strong>": unidadesconservacaoLayer,
+    "<strong><span style='font-size: 15px;'>Municípios Alto Solimões</span></strong>": municipiosamazonasLayer,
+     "<strong><span style='font-size: 15px;'>Lago Kokama</span></strong>": Lagos_kokama,
+
+
+};
+
+// Etapa 2 Crear el control de capas
+var layerControl = L.control.layers(null, overlayMaps_terrasindigenas, { collapsed: true, position: 'topright' })
+.addTo(map);
+
+  </script>
+</body>
+
